@@ -640,5 +640,6 @@ if __name__ == "__main__":
         print(f"[!] DBが見つかりません: {DB_PATH}")
         print("    wordlist.db または wordlist.zip を同じフォルダに配置してください。")
 
-    # 同一LANのスマホから触るなら host="0.0.0.0"
-    app.run(host="0.0.0.0", port=5000, debug=False)
+     # Railway などの PaaS 用：PORT 環境変数を優先
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
