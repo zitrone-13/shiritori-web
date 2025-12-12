@@ -5,10 +5,6 @@ def get_page_html() -> str:
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Shiritori</title>
-
-  <!-- ★ KeiFont を先読み（任意だけど効く） -->
-  <link rel="preload" href="/static/keifont.ttf" as="font" type="font/ttf" crossorigin>
-
   <style>
     :root{
       --ig1:#f09433; --ig2:#e6683c; --ig3:#dc2743; --ig4:#cc2366; --ig5:#bc1888;
@@ -36,24 +32,11 @@ def get_page_html() -> str:
         --sq-fg: #fff;
       }
     }
-
-    /* ★ KeiFont 読み込み（static/keifont.ttf を使う） */
-    @font-face {
-      font-family: "KeiFont";
-      src: url("/static/keifont.ttf") format("truetype");
-      font-weight: 400;
-      font-style: normal;
-      font-display: swap; /* 先に表示→後から差し替え */
-    }
-
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0; color:var(--text); background: var(--bg);
-
-      /* ★ 全体フォントをKeiFont優先に */
-      font-family: "KeiFont", system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
-
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
       -webkit-text-size-adjust: 100%;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
@@ -153,9 +136,6 @@ def get_page_html() -> str:
     input[type=text]{
       flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size:16px;
       background: var(--card); color: var(--text);
-
-      /* ★ 入力欄もKeiFont優先 */
-      font-family: "KeiFont", system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
     }
     .error{ color: #fca5a5; margin-top: 6px; min-height:1em; }
 
@@ -202,6 +182,42 @@ def get_page_html() -> str:
       .bubble{ max-width: 86%; }
       .modal-inner{ inset: 4% 3%; }
       .side{ display:none; } /* 左の固定幅はスマホで隠す */
+
+      /* ★修正1: スマホ時、攻め指定パネルを画面幅(100vw)・中央寄せ */
+      .prefer-pane{
+        left: 0;
+        right: 0;
+        padding: 0 12px;
+        align-items: flex-end; /* ボタンは右寄せのまま */
+      }
+      .prefer-card{
+        width: 100vw;
+        max-width: 100vw;
+        margin-left: calc(-12px - env(safe-area-inset-left));
+        margin-right: calc(-12px - env(safe-area-inset-right));
+        border-radius: 0;
+        text-align: center;
+      }
+      .prefer-head{
+        justify-content: center;
+        position: relative;
+      }
+      .prefer-title{
+        flex: 1;
+        text-align: center;
+      }
+      .prefer-head button{
+        position: absolute;
+        right: 10px;
+        top: 0;
+      }
+      .prefer-card .input-row{
+        justify-content: center;
+      }
+      #kanaInput{
+        flex: 0 1 auto;
+        width: min(72vw, 340px);
+      }
     }
   </style>
 </head>
@@ -222,7 +238,7 @@ def get_page_html() -> str:
           <button class="btn ghost small" onclick="startGame(1)">1分</button>
           <button class="btn ghost small" onclick="startGame(3)">3分</button>
           <button class="btn ghost small" onclick="startGame(5)">5分</button>
-          <!-- ★ エンドレスはShiritori.py側で廃止前提のため削除 -->
+          <button class="btn small" onclick="startGame('endless')">エンドレス</button>
         </div>
         <!-- 右上固定：攻め指定 -->
         <div class="prefer-pane">
@@ -362,10 +378,11 @@ function scrollToGameArea(){
   setTimeout(doScroll, 300);
 }
 
-function startGame(mins) {
+function startGame(minsOrMode) {
   const prefer_ends = Array.from(selectedKana);
-  const payload = { minutes: mins, prefer_ends };
-
+  const payload = (minsOrMode === 'endless')
+      ? { mode: 'endless', prefer_ends }
+      : { minutes: minsOrMode, prefer_ends };
   fetch("/start", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -375,7 +392,6 @@ function startGame(mins) {
     focusInput();       // ここでキーボードが出る
     scrollToGameArea(); // その直後にHUD/入力欄がキーボードの上に来るようスクロール
   });
-
   if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(fetchState, 500);
 }
@@ -664,9 +680,7 @@ document.getElementById("page").addEventListener("click", (e) => {
     focusInput(false);
   }
 });
-
-/* ★ load時の強制focusInput()をやめる（終了状態で攻め指定を触りたい時に邪魔になりがち） */
-window.addEventListener("load", () => { fetchState(); renderPreferList(); updatePreferControls(); });
+window.addEventListener("load", () => { fetchState(); focusInput(); renderPreferList(); updatePreferControls(); });
 </script>
 </body>
 </html>"""
