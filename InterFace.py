@@ -32,11 +32,19 @@ def get_page_html() -> str:
         --sq-fg: #fff;
       }
     }
+
+    /* ★ けいフォント読み込み（static/keifont.ttf） */
+    @font-face{
+      font-family: "KeiFont";
+      src: url("/static/keifont.ttf") format("truetype");
+      font-display: swap;
+    }
+
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0; color:var(--text); background: var(--bg);
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      font-family: "KeiFont", system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
       -webkit-text-size-adjust: 100%;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
@@ -74,19 +82,19 @@ def get_page_html() -> str:
     /* 2カラム：左は固定幅、右は拡張（チャット） */
     .layout{
       display:grid;
-      grid-template-columns: clamp(300px, 28%, 360px) 1fr; /* 左の大きさは維持、右を拡張 */
+      grid-template-columns: clamp(300px, 28%, 360px) 1fr;
       gap:12px; align-items:start;
     }
     .side { display:flex; flex-direction:column; gap:12px; }
 
-    /* 左：正方形2つを“隙間なく”横並び（幅ピッタリ） */
+    /* 左：正方形2つ */
     .square-grid{
       display:grid;
       grid-template-columns: repeat(2, 1fr);
       gap:12px;
     }
     .square{
-      aspect-ratio: 1 / 1; /* 正方形 */
+      aspect-ratio: 1 / 1;
       border:1px solid var(--border); border-radius:16px; box-shadow: var(--shadow);
       background: var(--sq-bg); color: var(--sq-fg);
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
@@ -99,7 +107,7 @@ def get_page_html() -> str:
     .pref-mode { font-weight:700; color: var(--chip-text); background: var(--chip-bg);
                  border:1px solid rgba(0,0,0,0.06); padding:8px 10px; border-radius:999px; display:inline-block; }
 
-    /* ポイント＆残り時間（左に集約） */
+    /* ポイント＆残り時間 */
     .stat-box{
       border:1px solid var(--border); border-radius:16px; background: var(--card); box-shadow: var(--shadow);
       padding:14px; display:flex; flex-direction:column; gap:8px;
@@ -110,11 +118,11 @@ def get_page_html() -> str:
       font-weight:900; letter-spacing: 0.02em;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1, "lnum" 1;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; /* 半角固定 */
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     }
     .time-big{ font-size: clamp(26px, 4vw, 34px); font-weight:900; font-variant-numeric: tabular-nums; }
 
-    /* DM風チャット（右カラムを広く） */
+    /* DM風チャット */
     .chat-wrap{ position: relative; border: 1px solid var(--border); border-radius: 14px; background: color-mix(in oklab, var(--card), #ffffff 6%); overflow: hidden; }
     .chat{
       height: min(54svh, 520px);
@@ -131,7 +139,7 @@ def get_page_html() -> str:
     .system .bubble{ background: var(--dm-system); border-top-left-radius: 6px; }
     .user   .bubble{ background: var(--dm-user);   border-top-right-radius: 6px; }
 
-    /* 入力行（右カラム下） */
+    /* 入力行 */
     .input-row{ display:flex; gap:8px; align-items:center; padding-top:8px; }
     input[type=text]{
       flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid #cbd5e1; font-size:16px;
@@ -139,25 +147,33 @@ def get_page_html() -> str:
     }
     .error{ color: #fca5a5; margin-top: 6px; min-height:1em; }
 
-    /* 右上ミニパネル（攻め指定） */
+    /* ★ 攻め指定：ヘッダー内に配置（?の左） */
     .prefer-pane{
-      position: fixed;
-      top: 18px;      /* ★ ? ボタンと高さがだいたい揃うように少し下げる */
-      right: 88px;    /* ? ボタンと横方向で被らないように左へオフセット */
-      z-index: 10;
+      position: relative;
       display:flex;
       flex-direction:column;
-      gap:8px;
       align-items:flex-end;
     }
-    .prefer-card{ display:none; width: min(320px, 86vw); background: var(--card); border:1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 10px; }
+    .prefer-card{
+      display:none;
+      width: min(360px, 86vw);
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 999;
+    }
     .prefer-card.show{ display:block; }
-    .prefer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .prefer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:8px; }
     .prefer-title{ font-weight:800; font-size:14px; color:var(--text); }
-    .prefer-list{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 8px; }
+    .prefer-list{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 8px; justify-content:center; }
     .prefer-chip{ padding: 6px 10px; border-radius: 999px; border:1px solid var(--border); background: color-mix(in oklab, var(--card), #ffffff 4%); font-weight:700; cursor:pointer; }
 
-    /* ルールモーダル（？ボタン） */
+    /* ルールモーダル */
     .modal{ position: fixed; inset: 0; background: var(--overlay); display:none; z-index:1000; }
     .modal.show{ display:block; }
     .modal-inner{ position:absolute; inset: 6% 4%; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); border:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:10px; }
@@ -165,38 +181,40 @@ def get_page_html() -> str:
     .modal-title{ font-weight:800; }
     .modal-close{ border:none; background:transparent; font-size:22px; cursor:pointer; color:#9aa3b2; }
 
-    /* スマホ最適化（左サイド非表示→1画面収め/HUD） */
+    /* スマホHUD */
     .mobile-hud{ display:none; margin-top:6px; gap:6px; flex-wrap:wrap; }
     .chip{ padding: 6px 10px; border-radius: 999px; background: var(--chip-bg); color:var(--chip-text); border:1px solid rgba(0,0,0,0.06); }
     .timer{ font-variant-numeric: tabular-nums; font-weight: 800; }
 
     @media (max-width: 900px){
-      .layout{ display:block; } /* 右をフル幅に */
-      .prefer-pane{ top: 16px; } /* タブレット〜スマホでも少し下寄せ */
+      .layout{ display:block; }
       .chat{ height: min(58svh, 520px); }
     }
+
     @media (max-width: 640px){
       .mobile-hud{ display:flex; }
       .time-buttons .btn{ padding:6px 9px; font-size:12px; }
       h1{ font-size:18px; }
       .bubble{ max-width: 86%; }
       .modal-inner{ inset: 4% 3%; }
-      .side{ display:none; } /* 左の固定幅はスマホで隠す */
+      .side{ display:none; }
 
-      /* ★修正1: スマホ時、攻め指定パネルを画面幅(100vw)・中央寄せ */
-      .prefer-pane{
+      /* ★スマホ：攻め指定タブを画面幅100vwに＆中央寄せ＆縦幅確保 */
+      .prefer-card{
+        position: fixed;
         left: 0;
         right: 0;
-        padding: 0 12px;
-        align-items: flex-end; /* ボタンは右寄せのまま */
-      }
-      .prefer-card{
+        top: calc(env(safe-area-inset-top) + 64px); /* ヘッダーの下あたり */
         width: 100vw;
         max-width: 100vw;
-        margin-left: calc(-12px - env(safe-area-inset-left));
-        margin-right: calc(-12px - env(safe-area-inset-right));
         border-radius: 0;
         text-align: center;
+
+        /* 縦幅：非常識に狭くならないように保証 */
+        min-height: 240px;
+        max-height: 72svh;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
       }
       .prefer-head{
         justify-content: center;
@@ -210,6 +228,9 @@ def get_page_html() -> str:
         position: absolute;
         right: 10px;
         top: 0;
+      }
+      .prefer-card .muted{
+        text-align: center;
       }
       .prefer-card .input-row{
         justify-content: center;
@@ -227,7 +248,30 @@ def get_page_html() -> str:
       <!-- header -->
       <div class="header">
         <h1>Shiritori</h1>
+
+        <!-- ★ 攻め指定ボタンを ? の左に -->
         <div class="header-actions">
+          <div class="prefer-pane">
+            <button class="btn small" id="preferToggle" onclick="togglePreferPane()">攻め指定</button>
+            <div class="prefer-card" id="preferCard" aria-label="攻め指定パネル">
+              <div class="prefer-head">
+                <div class="prefer-title">終端に優先したい文字を登録（最大3文字）</div>
+                <button class="btn ghost small" onclick="togglePreferPane(false)">閉じる</button>
+              </div>
+              <div class="muted" style="margin-bottom:6px;">ひらがなを最大3文字まとめて入力 → Enter/送信で追加</div>
+              <div class="input-row" style="padding-top:0;">
+                <input id="kanaInput" type="text" placeholder="例：かさた（最大3文字）" inputmode="kana" maxlength="3"
+                       enterkeyhint="send" autocomplete="off" autocapitalize="none" spellcheck="false" lang="ja"/>
+                <button class="btn small" id="preferSendBtn" onclick="addPreferKana()">送信</button>
+              </div>
+              <div class="prefer-list" id="preferList"></div>
+              <div style="display:flex; justify-content:flex-end;">
+                <button class="btn ghost small" onclick="clearKana()">クリア</button>
+              </div>
+              <div class="muted" style="margin-top:6px;">※ 3文字入力済みの場合はクリアすると変更できます</div>
+            </div>
+          </div>
+
           <button class="btn ghost small" onclick="openRules()">？</button>
         </div>
       </div>
@@ -240,30 +284,9 @@ def get_page_html() -> str:
           <button class="btn ghost small" onclick="startGame(5)">5分</button>
           <button class="btn small" onclick="startGame('endless')">エンドレス</button>
         </div>
-        <!-- 右上固定：攻め指定 -->
-        <div class="prefer-pane">
-          <button class="btn small" id="preferToggle" onclick="togglePreferPane()">攻め指定</button>
-          <div class="prefer-card" id="preferCard" aria-label="攻め指定パネル">
-            <div class="prefer-head">
-              <div class="prefer-title">終端に優先したい文字を登録（最大3文字）</div>
-              <button class="btn ghost small" onclick="togglePreferPane(false)">閉じる</button>
-            </div>
-            <div class="muted" style="margin-bottom:6px;">ひらがなを最大3文字まとめて入力 → Enter/送信で追加</div>
-            <div class="input-row" style="padding-top:0;">
-              <input id="kanaInput" type="text" placeholder="例：かさた（最大3文字）" inputmode="kana" maxlength="3"
-                     enterkeyhint="send" autocomplete="off" autocapitalize="none" spellcheck="false" lang="ja"/>
-              <button class="btn small" id="preferSendBtn" onclick="addPreferKana()">送信</button>
-            </div>
-            <div class="prefer-list" id="preferList"></div>
-            <div style="display:flex; justify-content:flex-end;">
-              <button class="btn ghost small" onclick="clearKana()">クリア</button>
-            </div>
-            <div class="muted" style="margin-top:6px;">※ 3文字入力済みの場合はクリアすると変更できます</div>
-          </div>
-        </div>
       </div>
 
-      <!-- 2カラム本体：左（正方形＋モード＋ポイント＋残り）、右（チャット拡張） -->
+      <!-- 2カラム本体 -->
       <div class="layout">
         <!-- 左 -->
         <aside class="side">
@@ -290,7 +313,7 @@ def get_page_html() -> str:
           </div>
         </aside>
 
-        <!-- 右（拡張されたチャット＋入力） -->
+        <!-- 右 -->
         <main>
           <div class="chat-wrap">
             <div class="chat" id="chat" tabindex="0" title="ここをクリックすると入力欄にフォーカスします"></div>
@@ -327,7 +350,6 @@ def get_page_html() -> str:
         ・2〜3文字は無効／末尾「ん」は無効<br/>
         ・拗音は大きく扱う・長音は1つ前の文字<br/>
         ・末尾「ぢ」「づ」→ 開始「じ」「ず」
-        ☆単語が存在するかどうかをシステムが判定します
       </div>
       <div style="display:flex; justify-content:flex-end;">
         <button class="btn ghost small" onclick="closeRules()">閉じる</button>
@@ -351,9 +373,8 @@ function focusInput(moveToEnd=true) {
   if (moveToEnd) { const v = inp.value; inp.value = ""; inp.value = v; }
 }
 
-/* スマホで開始時にゲームエリアへスクロール（キーボードの上あたりにHUDが来るイメージ） */
+/* スマホで開始時にゲームエリアへスクロール */
 function scrollToGameArea(){
-  // 幅 900px 以下（タブレット〜スマホ）のときだけ
   if (window.innerWidth > 900) return;
 
   const target =
@@ -364,18 +385,14 @@ function scrollToGameArea(){
 
   const doScroll = () => {
     try {
-      // HUDや入力欄が画面の下寄り（＝キーボード直上付近）に来るように
       target.scrollIntoView({ behavior: "smooth", block: "end" });
     } catch(e) {
-      // 古いブラウザ向けフォールバック
       const rect = target.getBoundingClientRect();
       window.scrollTo(0, rect.top + window.pageYOffset - 40);
     }
   };
 
-  // すぐ一回スクロール
   doScroll();
-  // キーボード表示後のレイアウト変化に合わせて、少し待ってからもう一回
   setTimeout(doScroll, 300);
 }
 
@@ -390,8 +407,8 @@ function startGame(minsOrMode) {
     body: JSON.stringify(payload)
   }).then(r => r.json()).then(state => {
     updateUIFromState(state);
-    focusInput();       // ここでキーボードが出る
-    scrollToGameArea(); // その直後にHUD/入力欄がキーボードの上に来るようスクロール
+    focusInput();
+    scrollToGameArea();
   });
   if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(fetchState, 500);
@@ -461,10 +478,8 @@ function updateUIFromState(state) {
   const bonus_chip = document.getElementById("bonus_chip");
   const err = document.getElementById("error");
 
-  // 「is_running かつ 残り時間 > 0」のときだけゲーム中扱い
   gameRunning = !!state.is_running && (state.time_left || 0) > 0;
 
-  // チャット描画（最新が下）
   chat.innerHTML = "";
   (state.messages || []).forEach(m => {
     const row = document.createElement("div");
@@ -484,12 +499,10 @@ function updateUIFromState(state) {
   });
   chat.scrollTop = chat.scrollHeight;
 
-  // ポイント（半角固定）
   const sc = pad4(state.score ?? 0);
   score_big.textContent = sc;
   if (score_chip) score_chip.textContent = sc;
 
-  // 文字数・ボーナス
   const tgt = state.target_len ?? "-";
   const bon = state.bonus_char || "-";
   len_square.textContent = tgt;
@@ -497,20 +510,15 @@ function updateUIFromState(state) {
   if (len_chip) len_chip.textContent = tgt;
   if (bonus_chip) bonus_chip.textContent = bon;
 
-  // 残り時間
   setTimeViews(state.time_left, !!state.is_endless);
 
-  // エラー
   err.textContent = state.error || "";
 
-  // 終端優先（表示）
   const prefs = (state.prefer_ends || []);
   setPrefMode(prefs);
 
-  // 攻め指定UI（ロック状態の反映）
   updatePreferControls();
 
-  // 入力フォーカス（ゲーム中だけ）
   if (state.whose_turn === "user" && gameRunning) { focusInput(false); }
 }
 
@@ -526,7 +534,6 @@ document.addEventListener("keydown", (e) => {
   const active = document.activeElement;
   const isTypingKey = (e.key && e.key.length === 1) && !e.ctrlKey && !e.metaKey && !e.altKey;
   if (isTypingKey && (!active || (active.id !== "inputWord" && active.id !== "kanaInput" && active.tagName !== "INPUT" && active.tagName !== "TEXTAREA"))) {
-    // ゲーム中のみ、しりとり入力にフォーカスを奪う
     if (gameRunning) {
       focusInput(false);
     }
@@ -618,7 +625,6 @@ function renderPreferList(){
     span.title = preferLocked ? "3文字入力済み。変更するにはクリアしてください。" : "クリックで削除";
     span.addEventListener("click", ()=>{
       if (preferLocked) {
-        // 3文字埋まっているときは個別削除不可（クリアのみ）
         flashError("3文字入力済みです。変更する場合はクリアしてください。");
         return;
       }
@@ -668,13 +674,11 @@ function flashError(msg){
 
 /* ===== 初期化 ===== */
 document.getElementById("chat").addEventListener("click", () => {
-  // ゲーム中だけチャットクリックで入力欄にフォーカス
   if (gameRunning) {
     focusInput(false);
   }
 });
 document.getElementById("page").addEventListener("click", (e) => {
-  // ゲームが終わっているときはフォーカスを奪わない
   if (!gameRunning) return;
   const id = (e.target && e.target.id) || "";
   if (id !== "inputWord" && id !== "sendBtn" && id !== "kanaInput") {
