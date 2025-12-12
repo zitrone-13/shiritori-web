@@ -327,6 +327,7 @@ def get_page_html() -> str:
         ・2〜3文字は無効／末尾「ん」は無効<br/>
         ・拗音は大きく扱う・長音は1つ前の文字<br/>
         ・末尾「ぢ」「づ」→ 開始「じ」「ず」
+        ☆単語が存在するかどうかをシステムが判定します
       </div>
       <div style="display:flex; justify-content:flex-end;">
         <button class="btn ghost small" onclick="closeRules()">閉じる</button>
