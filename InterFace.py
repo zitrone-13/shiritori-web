@@ -141,7 +141,7 @@ def get_page_html() -> str:
     }
     .error{ color: #fca5a5; margin-top: 6px; min-height:1em; }
 
-    /* ★ 攻め指定：ヘッダー内に配置（?の左） */
+    /* 攻め指定 */
     .prefer-pane{
       position: relative;
       display:flex;
@@ -155,27 +155,60 @@ def get_page_html() -> str:
       border:1px solid var(--border);
       border-radius: 12px;
       box-shadow: var(--shadow);
+
+      /* ★ ここが本命：閉じるボタンより下から「本文が始まる」ように上paddingを増やす */
       padding: 12px;
+      padding-top: 52px; /* ← 閉じるボタンの高さ＋余白を確保（被り完全回避） */
+
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
       z-index: 999;
     }
     .prefer-card.show{ display:block; }
-    .prefer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:0; gap:8px; }
-    .prefer-title{ font-weight:800; font-size:14px; color:var(--text); }
 
-    /* ★ 修正1：説明文を「確実に」ヘッダーの下へ離す */
-    .prefer-desc{
-      margin-top: 10px;   /* ← ここが本体：被りを物理的に回避 */
-      margin-bottom: 6px;
-      text-align: center;
+    .prefer-head{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+
+      /* ★ ヘッダーはカードの一番上に「浮かせる」 */
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      left: 12px;
+      height: 32px;
     }
 
-    .prefer-list{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 8px; justify-content:center; }
-    .prefer-chip{ padding: 6px 10px; border-radius: 999px; border:1px solid var(--border); background: color-mix(in oklab, var(--card), #ffffff 4%); font-weight:700; cursor:pointer; }
+    /* タイトル（終端〜）を「本文開始位置」に置くので、見た目の余白を少し追加 */
+    .prefer-title{
+      font-weight:800;
+      font-size:14px;
+      color:var(--text);
+      text-align:center;
+      width: 100%;
+      padding-top: 6px; /* ← 要望：終端〜の文面の上にさらにpadding */
+    }
 
-    /* ★ 修正2：送信の真下にクリア（サイズ統一） */
+    /* 説明文（指定の文面に変更） */
+    .prefer-desc{
+      margin-top: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .prefer-list{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 10px; justify-content:center; }
+
+    .prefer-chip{
+      padding: 6px 10px; border-radius: 999px;
+      border:1px solid var(--border);
+      background: color-mix(in oklab, var(--card), #ffffff 4%);
+      font-weight:700; cursor:pointer;
+    }
+
+    /* 送信の真下にクリア（サイズ統一） */
     .prefer-input-row{
       display:flex;
       gap:8px;
@@ -222,27 +255,25 @@ def get_page_html() -> str:
         border-radius: 0;
         text-align: center;
 
-        min-height: 260px; /* 説明文を下げた分だけ微増 */
+        /* ★ スマホでも同じ考え方で上paddingを確保 */
+        padding-top: 58px;
+        min-height: 300px;
         max-height: 72svh;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
       }
+
       .prefer-head{
-        justify-content: center;
-        position: relative;
-      }
-      .prefer-title{
-        flex: 1;
-        text-align: center;
-        padding-right: 72px; /* 閉じるボタン分の逃げ */
-      }
-      .prefer-head button{
         position: absolute;
+        top: 10px;
+        left: 10px;
         right: 10px;
-        top: 0;
+        height: 34px;
+        justify-content:flex-end;
       }
-      .prefer-card .muted{
-        text-align: center;
+
+      .prefer-title{
+        padding-top: 10px;
       }
 
       #kanaInput{
@@ -264,15 +295,17 @@ def get_page_html() -> str:
 
             <div class="prefer-card" id="preferCard" aria-label="攻め指定パネル">
               <div class="prefer-head">
-                <div class="prefer-title">終端に優先したい文字を登録（最大3文字）</div>
                 <button class="btn ghost small" onclick="togglePreferPane(false)">閉じる</button>
               </div>
 
-              <!-- ★ 修正1：この説明文を「確実に」下へ -->
-              <div class="muted prefer-desc">ひらがなを最大3文字まとめて入力 → Enter/送信で追加</div>
+              <div class="prefer-title">終端に優先したい文字を登録（最大3文字）</div>
 
-              <!-- ★ 修正2：送信の真下にクリア -->
-              <div class="prefer-input-row" style="padding-top:0;">
+              <div class="muted prefer-desc">
+                入力→Enter/送信で追加完了<br/>
+                ※3文字入力済みの場合はクリアすると変更できます
+              </div>
+
+              <div class="prefer-input-row">
                 <input id="kanaInput" type="text" placeholder="例：かさた（最大3文字）" inputmode="kana" maxlength="3"
                        enterkeyhint="send" autocomplete="off" autocapitalize="none" spellcheck="false" lang="ja"/>
                 <div class="prefer-actions">
@@ -282,8 +315,6 @@ def get_page_html() -> str:
               </div>
 
               <div class="prefer-list" id="preferList"></div>
-
-              <div class="muted" style="margin-top:6px;">※ 3文字入力済みの場合はクリアすると変更できます</div>
             </div>
           </div>
 
@@ -547,9 +578,7 @@ function togglePreferPane(force){
   card.classList.toggle("show", show);
   if (show) {
     const input = document.getElementById("kanaInput");
-    if (input && !preferLocked) {
-      input.focus({preventScroll:true});
-    }
+    if (input && !preferLocked) input.focus({preventScroll:true});
   }
   renderPreferList();
   updatePreferControls();
@@ -577,42 +606,27 @@ function addPreferKana(){
   }
 
   let added = false;
-
   for (const chRaw of raw) {
-    if (selectedKana.size >= PREFER_MAX) {
-      preferLocked = true;
-      break;
-    }
+    if (selectedKana.size >= PREFER_MAX) { preferLocked = true; break; }
     const ch = hiraOnly(chRaw);
     if (!ch) continue;
-    if (!selectedKana.has(ch)) {
-      selectedKana.add(ch);
-      added = true;
-    }
+    if (!selectedKana.has(ch)) { selectedKana.add(ch); added = true; }
   }
 
   if (!added) {
-    if (!preferLocked) {
-      flashError("ひらがなを入力してください");
-      input.select();
-    } else {
-      flashError("攻め指定は最大3文字です。クリアすると変更できます。");
-    }
+    if (!preferLocked) { flashError("ひらがなを入力してください"); input.select(); }
+    else { flashError("攻め指定は最大3文字です。クリアすると変更できます。"); }
     return;
   }
 
-  if (selectedKana.size >= PREFER_MAX) {
-    preferLocked = true;
-  }
+  if (selectedKana.size >= PREFER_MAX) preferLocked = true;
 
   input.value = "";
   renderPreferList();
   renderPrefViewOnly();
   updatePreferControls();
 
-  if (!preferLocked) {
-    input.focus({preventScroll:true});
-  }
+  if (!preferLocked) input.focus({preventScroll:true});
 }
 
 function renderPreferList(){
@@ -624,10 +638,7 @@ function renderPreferList(){
     span.textContent = ch;
     span.title = preferLocked ? "3文字入力済み。変更するにはクリアしてください。" : "クリックで削除";
     span.addEventListener("click", ()=>{
-      if (preferLocked) {
-        flashError("3文字入力済みです。変更する場合はクリアしてください。");
-        return;
-      }
+      if (preferLocked) { flashError("3文字入力済みです。変更する場合はクリアしてください。"); return; }
       selectedKana.delete(ch);
       renderPreferList();
       renderPrefViewOnly();
@@ -648,10 +659,7 @@ function clearKana(){
   renderPrefViewOnly();
   updatePreferControls();
   const input = document.getElementById("kanaInput");
-  if (input) {
-    input.value = "";
-    input.focus({preventScroll:true});
-  }
+  if (input) { input.value = ""; input.focus({preventScroll:true}); }
 }
 
 function openRules(){ document.getElementById("rulesModal").classList.add("show"); }
@@ -670,15 +678,11 @@ function flashError(msg){
   });
 }
 
-document.getElementById("chat").addEventListener("click", () => {
-  if (gameRunning) { focusInput(false); }
-});
+document.getElementById("chat").addEventListener("click", () => { if (gameRunning) focusInput(false); });
 document.getElementById("page").addEventListener("click", (e) => {
   if (!gameRunning) return;
   const id = (e.target && e.target.id) || "";
-  if (id !== "inputWord" && id !== "sendBtn" && id !== "kanaInput") {
-    focusInput(false);
-  }
+  if (id !== "inputWord" && id !== "sendBtn" && id !== "kanaInput") focusInput(false);
 });
 window.addEventListener("load", () => { fetchState(); focusInput(); renderPreferList(); updatePreferControls(); });
 </script>
