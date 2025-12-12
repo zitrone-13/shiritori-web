@@ -210,8 +210,8 @@ def get_page_html() -> str:
         border-radius: 0;
         text-align: center;
 
-        /* 縦幅：非常識に狭くならないように保証 */
-        min-height: 240px;
+        /* 縦幅：少し余裕を増やす */
+        min-height: 280px;
         max-height: 72svh;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
@@ -239,6 +239,11 @@ def get_page_html() -> str:
         flex: 0 1 auto;
         width: min(72vw, 340px);
       }
+
+      /* ★修正1：説明文を少し下へ（閉じるボタンと視覚的に干渉しにくく） */
+      .prefer-card .muted:first-of-type{
+        margin-top: 10px;
+      }
     }
   </style>
 </head>
@@ -259,15 +264,20 @@ def get_page_html() -> str:
                 <button class="btn ghost small" onclick="togglePreferPane(false)">閉じる</button>
               </div>
               <div class="muted" style="margin-bottom:6px;">ひらがなを最大3文字まとめて入力 → Enter/送信で追加</div>
+
               <div class="input-row" style="padding-top:0;">
                 <input id="kanaInput" type="text" placeholder="例：かさた（最大3文字）" inputmode="kana" maxlength="3"
                        enterkeyhint="send" autocomplete="off" autocapitalize="none" spellcheck="false" lang="ja"/>
                 <button class="btn small" id="preferSendBtn" onclick="addPreferKana()">送信</button>
               </div>
+
               <div class="prefer-list" id="preferList"></div>
-              <div style="display:flex; justify-content:flex-end;">
-                <button class="btn ghost small" onclick="clearKana()">クリア</button>
+
+              <!-- ★修正2：送信の真下にクリア（サイズも btn small で統一） -->
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px; margin-top:6px;">
+                <button class="btn small" onclick="clearKana()">クリア</button>
               </div>
+
               <div class="muted" style="margin-top:6px;">※ 3文字入力済みの場合はクリアすると変更できます</div>
             </div>
           </div>
