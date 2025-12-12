@@ -484,7 +484,10 @@ def start():
     if minutes not in (1, 3, 5):
         minutes = 3
     session["is_endless"] = False
-    session["ends_at"] = time.time() + minutes * 60
+
+    # ★ タイマー開始は「最初のシステム単語が確定して表示された後」にしたいので
+    #   ここでは ends_at をセットしない
+    session["ends_at"] = 0.0
 
     # 終端優先
     prefer_ends = sanitize_prefer_ends(data.get("prefer_ends", []))
@@ -502,10 +505,15 @@ def start():
     used.add(opening)
     set_used_set(used)
 
+    # 最初のシステム単語を確定して表示
     session["messages"].append({"side": "system", "text": opening})
     session["whose_turn"] = "user"
     session["target_len"] = new_user_target_len()  # ★ 5〜9 or 「10以上」
     session["bonus_char"] = new_bonus_char()
+
+    # ★ ここでタイマー開始（ここからカウント）
+    session["ends_at"] = time.time() + minutes * 60
+
     session.modified = True
     return jsonify(state_payload())
 
